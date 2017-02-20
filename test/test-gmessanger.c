@@ -23,20 +23,6 @@
 #include "test-receiver-obj-b.h"
 
 static void
-test_messanger_singlenton (void)
-{
-  GMessanger *msger = NULL;
-  GMessanger *msger1 = NULL;
-
-  msger = g_messanger_new ();
-  msger1 = g_messanger_new ();
-
-  g_assert_true (msger == msger1);
-  g_object_unref (msger1);
-  g_object_unref (msger);
-}
-
-static void
 test_messanger_simple_send_msg (void)
 {
   GMessanger *msger = NULL;
@@ -65,7 +51,6 @@ main (gint   argc,
 {
   g_test_init (&argc, &argv, NULL);
 
-  g_test_add_func ("/test/messanger/singlenton", test_messanger_singlenton);
   g_test_add_func ("/test/messanger/simple/send/msg", test_messanger_simple_send_msg);
 
   g_test_run ();

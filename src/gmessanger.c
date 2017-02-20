@@ -51,20 +51,7 @@ g_messanger_init (GMessanger *self)
 GMessanger *
 g_messanger_new (void)
 {
-  static gpointer singlenton = NULL;
-
-  if (singlenton != NULL)
-    {
-      return g_object_ref (singlenton);
-    }
-  else if (g_once_init_enter (&singlenton))
-    {
-      GObject *obj = g_object_new (G_TYPE_MESSANGER, NULL);
-      g_object_add_weak_pointer (obj, &singlenton);
-      g_once_init_leave (&singlenton, obj);
-    }
-
-  return singlenton;
+  return g_object_new (G_TYPE_MESSANGER, NULL);
 }
 
 void
