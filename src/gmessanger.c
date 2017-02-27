@@ -19,6 +19,8 @@
 #include <gmessanger.h>
 #include <greceiver.h>
 
+static GRWLock lock;
+
 typedef struct
 {
   GHashTable *objs;
@@ -68,6 +70,8 @@ g_messanger_send_msg (GMessanger   *self,
 
   priv = g_messanger_get_instance_private (self);
 
+  g_rw_lock_reader_lock (&lock);
+
   if (!g_hash_table_contains (priv->objs, receiver))
     {
       g_warning ("%s: %s is not registered!", G_STRFUNC, receiver);
@@ -77,6 +81,8 @@ g_messanger_send_msg (GMessanger   *self,
   r = g_hash_table_lookup (priv->objs, receiver);
 
   g_receiver_receive (r, sender, pattern, data);
+
+  g_rw_lock_reader_unlock (&lock);
 }
 
 gboolean
@@ -92,6 +98,8 @@ g_messanger_register_object (GMessanger  *self,
 
   priv = g_messanger_get_instance_private (self);
 
+  g_rw_lock_writer_lock (&lock);
+
   if (g_hash_table_contains (priv->objs, id))
     {
       g_warning ("%s: cannot register object!", G_STRFUNC);
@@ -101,6 +109,8 @@ g_messanger_register_object (GMessanger  *self,
   g_hash_table_insert (priv->objs,
                        g_strdup (id),
                        g_object_ref (registered_object));
+
+  g_rw_lock_writer_unlock (&lock);
 
   return TRUE;
 }
@@ -118,6 +128,8 @@ g_messanger_force_register_object (GMessanger  *self,
 
   priv = g_messanger_get_instance_private (self);
 
+  g_rw_lock_writer_lock (&lock);
+
   if (g_hash_table_remove (priv->objs, id))
     {
       g_message ("%s: ", G_STRFUNC);
@@ -126,5 +138,7 @@ g_messanger_force_register_object (GMessanger  *self,
   g_hash_table_insert (priv->objs,
                        g_strdup (id),
                        g_object_ref (registered_object));
+
+  g_rw_lock_writer_unlock (&lock);
 }
 
