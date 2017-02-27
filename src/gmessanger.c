@@ -110,5 +110,21 @@ g_messanger_force_register_object (GMessanger  *self,
                                    GObject     *registered_object,
                                    const gchar *id)
 {
+  GMessangerPrivate *priv;
+
+  g_return_if_fail (G_IS_MESSANGER (self));
+  g_return_if_fail (G_IS_RECEIVER (registered_object));
+  g_return_if_fail (id != NULL);
+
+  priv = g_messanger_get_instance_private (self);
+
+  if (g_hash_table_remove (priv->objs, id))
+    {
+      g_message ("%s: ", G_STRFUNC);
+    }
+
+  g_hash_table_insert (priv->objs,
+                       g_strdup (id),
+                       g_object_ref (registered_object));
 }
 
